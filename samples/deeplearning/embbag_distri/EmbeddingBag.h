@@ -54,7 +54,7 @@ public:
 #ifdef USE_LIBXSMM_JIT
   void forward(long N, long NS, const long *offsets, const long *indices, T *output_)
   {
-    #pragma omp parallel for
+    #pragma omp for nowait
     for (int n = 0; n < N; n++)
     {
       libxsmm_meltw_unary_param params;

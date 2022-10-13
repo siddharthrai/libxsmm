@@ -366,13 +366,20 @@ int main(int argc, char * argv[]) {
   double fwdTime = 0.0, bwdTime = 0.0, updTime = 0.0;
   double packTime = 0.0, unpackTime = 0.0, fwdA2ATime = 0.0, bwdA2ATime = 0.0;
 
-  for (int i = 0; i < iters; i++) {
-    double t0 = get_time();
-    for (int s = 0; s < LS; s++) {
-      eb[s]->forward(N, eio[i][s]->NS, eio[i][s]->offsets, eio[i][s]->indices, eio[i][s]->output);
+  #pragma omp parallel
+  {
+    int tid = omp_get_thread_num();
+    for (int i = 0; i < iters; i++) {
+      double t0 = get_time();
+      for (int s = 0; s < LS; s++) {
+        eb[s]->forward(N, eio[i][s]->NS, eio[i][s]->offsets, eio[i][s]->indices, eio[i][s]->output);
+      }
+      #pragma omp barrier
+      double t1 = get_time();
+      if (tid == 0) {
+        fwdTime += t1-t0;
+      }
     }
-    double t1 = get_time();
-    fwdTime += t1-t0;
   }
   double t1 = get_time();
 #ifdef VERIFY_CORRECTNESS
