@@ -70,6 +70,30 @@ public:
     }
   }
 #else
+  void forward(long N, long NS, const long *offsets, const long *indices, T *output_)
+  {
+    T(*__restrict weight)[E] = (T(*)[E])weight_;
+    T(*__restrict output)[E] = (T(*)[E])output_;
+
+#pragma omp for nowait
+    for (long n = 0; n < N; n++)
+    {
+      auto start = offsets[n];
+      auto end = (n < N - 1 ? offsets[n + 1] : NS);
+#pragma omp simd
+      for (long v = 0; v < E; v++)
+        output[n][v] = 0;
+      for (long s = start; s < end; s++)
+      {
+        auto ind = indices[s];
+#pragma omp simd
+        for (long v = 0; v < E; v++)
+        {
+          output[n][v] += weight[ind][v];
+        }
+      }
+    }
+  }
 #endif
 
 #ifdef USE_LIBXSMM_JIT
