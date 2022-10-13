@@ -170,7 +170,6 @@ void allocate_buffers_and_generte_rnd_input(int N, int P, double alpha, Embeddin
   eio->NS = NS;
   eio->indices = (ITyp*)my_malloc(NS * sizeof(ITyp), alignment);
   eio->grads = (DTyp*)my_malloc(NS * E * sizeof(DTyp), alignment);
-#pragma omp parallel for
   for (int n = 0; n < N; n++)
   {
     int start = eio->offsets[n];
