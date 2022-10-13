@@ -372,33 +372,8 @@ int main(int argc, char * argv[]) {
     for (int s = 0; s < LS; s++) {
       eb[s]->forward(N, eio[i][s]->NS, eio[i][s]->offsets, eio[i][s]->indices, eio[i][s]->output);
     }
-
     double t1 = get_time();
-    pack_for_a2a(LS, N, E, eio[i], A2Asrc);
-    double t2 = get_time();
-    alltoall(LS*N*E, A2Asrc, A2Adst);
-    double t3 = get_time();
-    alltoall(LS*N*E, A2Agsrc, A2Agdst);
-    double t4 = get_time();
-    unpack_from_a2a(LS, N, E, eio[i], A2Agdst);
-    double t5 = get_time();
-
-    for (int s = LS-1; s >= 0; s--) {
-      eb[s]->backward(N, eio[i][s]->NS, eio[i][s]->gradout, eio[i][s]->offsets, eio[i][s]->indices, eio[i][s]->grads);
-    }
-    double t6 = get_time();
-    for (int s = 0; s < LS; s++) {
-      eb[s]->update(eio[i][s]->NS, eio[i][s]->grads, eio[i][s]->indices, -0.1, M, use_rtm);
-    }
-    double t7 = get_time();
-    //printf("Iter %4d: F = %.3f   B = %.3f   U = %.3f\n", i, t1-t0, t2-t1, t3-t2);
     fwdTime += t1-t0;
-    bwdTime += t6-t5;
-    updTime += t7-t6;
-    packTime += t2-t1;
-    unpackTime += t5-t4;
-    fwdA2ATime += t3-t2;
-    bwdA2ATime += t4-t3;
   }
   double t1 = get_time();
 #ifdef VERIFY_CORRECTNESS

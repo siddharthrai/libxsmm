@@ -1,5 +1,5 @@
 USE_RTM=0
-STREAMING_WRITES=1
+STREAMING_WRITES=0
 USE_MPI=0
 USE_CCL=0
 USE_FP16=0
@@ -35,7 +35,7 @@ yesnolist += USE_LIBXSMM_JIT
 DEFS += $(strip $(foreach var, $(yesnolist), $(if $(filter 1, $($(var))), -D$(var))))
 DEFS += $(strip $(foreach var, $(deflist), $(if $($(var)), -D$(var)=$($(var)))))
 
-CXX=g++
+CXX=icpc
 
 ifeq ($(USE_MPI),1)
 CXX=mpicxx
@@ -45,7 +45,7 @@ endif
 all: main
 
 main: main.cpp utils.cpp utils.h rtm.h EmbeddingBag.h dist.h
-	$(CXX) -o main -g -O2 -mavx512f -mrtm -std=c++11 $(DEFS) utils.cpp main.cpp -fopenmp $(CCL_FLAGS)
+	$(CXX) -o main -O2 -std=c++11 $(DEFS) utils.cpp main.cpp -fopenmp $(CCL_FLAGS)
 
 clean:
 	rm -f main
