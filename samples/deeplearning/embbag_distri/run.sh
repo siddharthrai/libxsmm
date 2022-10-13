@@ -20,7 +20,8 @@ if [ "x$7" != "x" ] ; then p=$7; fi
 
 export KMP_AFFINITY=granularity=fine,compact,1,0
 BIN_FN=./main
-NUMACTL_ARGS="numactl -m 0 "
+#NUMACTL_ARGS="numactl -m 0 "
+NUMACTL_ARGS=" "
 
 if [ "${TH}" -gt "32" ]; then
   for T in ${TH} 32 16 8 4 1; do

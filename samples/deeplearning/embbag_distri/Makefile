@@ -45,8 +45,8 @@ endif
 all: main
 
 main: main.cpp utils.cpp utils.h rtm.h EmbeddingBag.h dist.h
-	#$(CXX) -o main -O2 -std=c++11 $(DEFS) utils.cpp main.cpp -fopenmp $(CCL_FLAGS)
-	$(CXX) -o main -O2 -xCORE-AVX512 -std=c++11 $(DEFS) utils.cpp main.cpp -fopenmp $(CCL_FLAGS)
+	$(CXX) -o main -O2 -std=c++11 $(DEFS) utils.cpp main.cpp -fopenmp $(CCL_FLAGS)
+	#$(CXX) -o main -O2 -xCORE-AVX512 -std=c++11 $(DEFS) utils.cpp main.cpp -fopenmp $(CCL_FLAGS)
 
 clean:
 	rm -f main
