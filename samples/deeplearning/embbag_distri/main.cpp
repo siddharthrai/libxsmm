@@ -372,7 +372,7 @@ int main(int argc, char * argv[]) {
     for (int i = 0; i < iters; i++) {
       double t0 = get_time();
       for (int s = 0; s < LS; s++) {
-        eb[s]->forward(N, eio[i][s]->NS, eio[i][s]->offsets, eio[i][s]->indices, eio[i][s]->output);
+        eb[s]->forward(N, eio[i][s]->NS, eio[i][s]->offsets, eio[i][s]->indices, eio[0][s]->output);
       }
       #pragma omp barrier
       double t1 = get_time();
@@ -395,7 +395,8 @@ int main(int argc, char * argv[]) {
   const size_t rfo = 2;
 #endif
 
-  size_t fwdBytes = ((size_t)tU*E + (size_t)rfo*iters*LS*N*E) * sizeof(DTyp) + ((size_t)tNS + (size_t)iters*LS*N) * sizeof(ITyp);
+  size_t fwdBytes = ((size_t)tU*E + (size_t)rfo*1*LS*N*E) * sizeof(DTyp) + ((size_t)tNS + (size_t)iters*LS*N) * sizeof(ITyp);
+  size_t fwdBytes2= ((size_t)tNS*E + (size_t)rfo*1*LS*N*E) * sizeof(DTyp) + ((size_t)tNS + (size_t)iters*LS*N) * sizeof(ITyp);
   size_t bwdBytes = ((size_t)rfo*tNS*E + (size_t)iters*LS*N*E) * sizeof(DTyp) + ((size_t)tNS) * sizeof(ITyp);
   size_t updBytes = ((size_t)2*tU*E + (size_t)tNS*E) * sizeof(DTyp) + ((size_t)tNS) * sizeof(ITyp);
 
@@ -407,11 +408,13 @@ int main(int argc, char * argv[]) {
 #endif
 
   my_printf("Per Iter  Time: Fwd: %.3f ms Bwd: %.3f ms Upd: %.3f  A2A: %.3f ms Total: %.3f ms\n", fwdTime/(iters), bwdTime/(iters), updTime/(iters), (fwdA2ATime+bwdA2ATime+packTime+unpackTime)/(iters), (t1-t0)/(iters));
-  my_printf("Per Table Time: Fwd: %.3f ms Bwd: %.3f ms Upd: %.3f  Total: %.3f ms\n", fwdTime/(iters*LS), bwdTime/(iters*LS), updTime/(iters*LS), (t1-t0)/(iters*LS));
+  my_printf("Per Table Time: Fwd: %.10f ms Bwd: %.3f ms Upd: %.3f  Total: %.3f ms\n", fwdTime/(iters*LS), bwdTime/(iters*LS), updTime/(iters*LS), (t1-t0)/(iters*LS));
 
   my_printf("Per Iter  A2ATime: Fwd: %.3f ms Bwd: %.3f ms Pack: %.3f ms Unpack: %.3f ms \n", fwdA2ATime/(iters), bwdA2ATime/(iters), packTime/(iters), unpackTime/(iters));
-  my_printf("BW: FWD: %.3f   BWD: %.3f GB/s   UPD: %.3f GB/s\n", fwdBytes*1e-6/fwdTime, bwdBytes*1e-6/bwdTime, updBytes*1e-6/updTime);
+  my_printf("BW: FWD: %.10f   BWD: %.3f GB/s   UPD: %.3f GB/s\n", fwdBytes*1e-6/fwdTime, bwdBytes*1e-6/bwdTime, updBytes*1e-6/updTime);
+  my_printf("BW: FWD2: %.10f   BWD: %.3f GB/s   UPD: %.3f GB/s\n", fwdBytes2*1e-6/fwdTime, bwdBytes*1e-6/bwdTime, updBytes*1e-6/updTime);
 
+  my_printf("MEASURE  %.10f,%.10f,%.10f\n", fwdTime, fwdBytes*1e-6/fwdTime, fwdBytes2*1e-6/fwdTime);
 
 #ifdef VERIFY_CORRECTNESS
   printf("Checksum = %g\n", checksum);
